@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+              http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+  <beans:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <beans:property name="location" value="/WEB-INF/sparklr.properties"/>
+  </beans:bean>
+
+  <http auto-config='true' access-denied-page="/login.jsp">
+    <intercept-url pattern="/sparklr/**" access="ROLE_USER" />
+    <intercept-url pattern="/facebook/**" access="ROLE_USER" />
+    <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+    <form-login authentication-failure-url="/login.jsp" default-target-url="/index.jsp" login-page="/login.jsp" login-processing-url="/login.do"/>
+    <logout logout-url="/logout.do" logout-success-url="/index.jsp" invalidate-session="true" />
+  </http>
+
+  <authentication-manager>
+    <authentication-provider>
+      <user-service>
+        <user name="marissa" password="wombat" authorities="ROLE_USER" />
+        <user name="sam" password="kangaroo" authorities="ROLE_USER" />
+      </user-service>
+    </authentication-provider>
+  </authentication-manager>
+
+  <beans:bean id="facebookOAuthSupport" class="org.betfair.security.oauth2.OAuthSupport">
+  	<beans:property name="clientId" value="162646850439461" />
+  	<beans:property name="clientSecret" value="560ad91d992d60298ae6c7f717c8fc93" />
+  	<beans:property name="providerClass" value="org.scribe.builder.api.FacebookApi" />
+  	<beans:property name="redirectUrl" value="http://localhost:8888/tonr/facebook/info.jsp" />
+  </beans:bean>
+
+  <beans:bean id="sparklrOAuthSupport" class="org.betfair.security.oauth2.OAuthSupport">
+  	<beans:property name="clientId" value="tonr" />
+  	<beans:property name="clientSecret" value="12345" />
+  	<beans:property name="providerClass" value="org.betfair.security.oauth2.sparklr.SparklrApi" />
+  	<beans:property name="redirectUrl" value="http://localhost:8888/tonr/sparklr/photos.jsp" />
+  </beans:bean>
+
+</beans:beans>
